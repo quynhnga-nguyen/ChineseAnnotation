@@ -33,38 +33,44 @@
     };  
 }(DOMParser));
 
-function getHanVietSync(character) {
+
+function getHanVietCallback(responseText) {
+	var hanviet = "";
+	var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
+	var responseDOM = new DOMParser().parseFromString(responseText, 'text/html');
+	var nodes = responseDOM.evaluate(xpath, responseDOM, null, XPathResult.ANY_TYPE, null);
+
+	var results = nodes. iterateNext();
+	while (results) {
+		hanviet += results.nodeValue + " ";
+		results = nodes.iterateNext();
+	}
+	hanviet += " | ";
+
+	var hanvietDiv = document.getElementById("hanviet");
+	hanvietDiv.innerHTML += hanviet;
+}
+
+
+function getHanVietAsync(character) {
     var xmlHttp = new XMLHttpRequest();
-    xmlHttp.open("GET", "https://hvdic.thivien.net/whv/" + character, false); // true for asynchronous 
-    xmlHttp.send(null);
 
-    if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-    	var hanviet = "";
-    	var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
-    	var responseDOM = new DOMParser().parseFromString(xmlHttp.responseText, 'text/html');
-    	var nodes = responseDOM.evaluate(xpath, responseDOM, null, XPathResult.ANY_TYPE, null);
-
-    	var results = nodes. iterateNext();
-    	while (results) {
-    		hanviet += results.nodeValue + " ";
-    		results = nodes.iterateNext();
-    	}
-
-    	hanviet += "| ";
-
-    	return hanviet;
+    xmlHttp.onreadystatechange = function() { 
+        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+        	getHanVietCallback(xmlHttp.responseText);
+        }
     }
+
+    xmlHttp.open("GET", "https://hvdic.thivien.net/whv/" + character, true); // true for asynchronous 
+    xmlHttp.send(null);
 }
 
 
 function annotateHanViet(){
-	console.log("in visible");
    	var characters = [];
 	var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
 	var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
 	var results = nodes.iterateNext();
-	console.log("result:");
-	console.log(results);
 
 	if (results) {
 		var text = results.nodeValue;
@@ -73,20 +79,14 @@ function annotateHanViet(){
 		}
 	}
 
-	var hanviet = "";
-	for (var i = 0; i < characters.length && characters[i] != "[" && characters[i] != " "; i++) {
-		console.log("char:");
-		console.log(characters[i]);
-		hanviet += getHanVietSync(characters[i]);
-		console.log("hanviet:");
-		console.log(hanviet);
-	}
-
-	var annotation = document.getElementById("mandarinspot-tip");
+	var annotationDiv = document.getElementById("mandarinspot-tip");
 	var hanvietDiv = document.createElement("div");
-	hanvietDiv.innerHTML = hanviet;
-	console.log(hanvietDiv);
-	annotation.appendChild(hanvietDiv);
+	hanvietDiv.setAttribute("id", "hanviet");
+	annotationDiv.appendChild(hanvietDiv);
+
+	for (var i = 0; i < characters.length && characters[i] != "[" && characters[i] != " "; i++) {
+		getHanVietAsync(characters[i]);
+	}
 }
 
 
