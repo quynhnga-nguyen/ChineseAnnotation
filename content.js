@@ -45,7 +45,7 @@ function getHanVietCallback(responseText, charId) {
 		hanviet += results.nodeValue + " ";
 		results = nodes.iterateNext();
 	}
-	hanviet += " | ";
+	//hanviet += " | ";
 
 	document.getElementById(charId).innerHTML = hanviet;
 }
@@ -73,7 +73,7 @@ function annotateHanViet(){
 
 	if (results) {
 		var text = results.nodeValue;
-		for (var i = 0; i < text.length; i++) {
+		for (var i = 0; i < text.length && text.charAt(i) != '[' && text.charAt(i) != ' '; i++) {
 			characters.push(text.charAt(i));
 		}
 
@@ -82,13 +82,17 @@ function annotateHanViet(){
 		hanvietDiv.setAttribute("id", "hanviet");
 		annotationDiv.appendChild(hanvietDiv);
 
-		for (var i = 0; i < characters.length && characters[i] != "[" && characters[i] != " "; i++) {
+		for (var i = 0; i < characters.length; i++) {
 			var charPlaceholder = document.createElement("span");
 			var charId = "hanvietChar" + i;
 			charPlaceholder.setAttribute("id", charId);
 			hanvietDiv.appendChild(charPlaceholder);
 
 			getHanVietAsync(characters[i], charId);
+
+			if (i + 1 < characters.length) {
+				hanvietDiv.innerHTML += " | ";
+			}
 		}
 	}
 }
