@@ -34,7 +34,7 @@
 }(DOMParser));
 
 
-function getHanVietCallback(responseText) {
+function getHanVietCallback(responseText, charId) {
 	var hanviet = "";
 	var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
 	var responseDOM = new DOMParser().parseFromString(responseText, 'text/html');
@@ -47,17 +47,16 @@ function getHanVietCallback(responseText) {
 	}
 	hanviet += " | ";
 
-	var hanvietDiv = document.getElementById("hanviet");
-	hanvietDiv.innerHTML += hanviet;
+	document.getElementById(charId).innerHTML = hanviet;
 }
 
 
-function getHanVietAsync(character) {
+function getHanVietAsync(character, charId) {
     var xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-        	getHanVietCallback(xmlHttp.responseText);
+        	getHanVietCallback(xmlHttp.responseText, charId);
         }
     }
 
@@ -77,15 +76,20 @@ function annotateHanViet(){
 		for (var i = 0; i < text.length; i++) {
 			characters.push(text.charAt(i));
 		}
-	}
 
-	var annotationDiv = document.getElementById("mandarinspot-tip");
-	var hanvietDiv = document.createElement("div");
-	hanvietDiv.setAttribute("id", "hanviet");
-	annotationDiv.appendChild(hanvietDiv);
+		var annotationDiv = document.getElementById("mandarinspot-tip");
+		var hanvietDiv = document.createElement("div");
+		hanvietDiv.setAttribute("id", "hanviet");
+		annotationDiv.appendChild(hanvietDiv);
 
-	for (var i = 0; i < characters.length && characters[i] != "[" && characters[i] != " "; i++) {
-		getHanVietAsync(characters[i]);
+		for (var i = 0; i < characters.length && characters[i] != "[" && characters[i] != " "; i++) {
+			var charPlaceholder = document.createElement("span");
+			var charId = "hanvietChar" + i;
+			charPlaceholder.setAttribute("id", charId);
+			hanvietDiv.appendChild(charPlaceholder);
+
+			getHanVietAsync(characters[i], charId);
+		}
 	}
 }
 
