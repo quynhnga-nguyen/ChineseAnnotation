@@ -35,19 +35,19 @@
 
 
 function getHanVietCallback(responseText, charId) {
-	var hanviet = "";
-	var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
-	var responseDOM = new DOMParser().parseFromString(responseText, 'text/html');
-	var nodes = responseDOM.evaluate(xpath, responseDOM, null, XPathResult.ANY_TYPE, null);
+    var hanviet = "";
+    var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
+    var responseDOM = new DOMParser().parseFromString(responseText, 'text/html');
+    var nodes = responseDOM.evaluate(xpath, responseDOM, null, XPathResult.ANY_TYPE, null);
 
-	var results = nodes. iterateNext();
-	while (results) {
-		hanviet += results.nodeValue + " ";
-		results = nodes.iterateNext();
-	}
-	//hanviet += " | ";
+    var results = nodes. iterateNext();
+    while (results) {
+        hanviet += results.nodeValue + " ";
+        results = nodes.iterateNext();
+    }
+    //hanviet += " | ";
 
-	document.getElementById(charId).innerHTML = hanviet;
+    document.getElementById(charId).innerHTML = hanviet;
 }
 
 
@@ -56,7 +56,7 @@ function getHanVietAsync(character, charId) {
 
     xmlHttp.onreadystatechange = function() { 
         if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-        	getHanVietCallback(xmlHttp.responseText, charId);
+            getHanVietCallback(xmlHttp.responseText, charId);
         }
     }
 
@@ -66,35 +66,35 @@ function getHanVietAsync(character, charId) {
 
 
 function annotateHanViet(){
-   	var characters = [];
-	var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
-	var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
-	var results = nodes.iterateNext();
+    var characters = [];
+    var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
+    var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
+    var results = nodes.iterateNext();
 
-	if (results) {
-		var text = results.nodeValue;
-		for (var i = 0; i < text.length && text.charAt(i) != '[' && text.charAt(i) != ' '; i++) {
-			characters.push(text.charAt(i));
-		}
+    if (results) {
+        var text = results.nodeValue;
+        for (var i = 0; i < text.length && text.charAt(i) != '[' && text.charAt(i) != ' '; i++) {
+            characters.push(text.charAt(i));
+        }
 
-		var annotationDiv = document.getElementById("mandarinspot-tip");
-		var hanvietDiv = document.createElement("div");
-		hanvietDiv.setAttribute("id", "hanviet");
-		annotationDiv.appendChild(hanvietDiv);
+        var annotationDiv = document.getElementById("mandarinspot-tip");
+        var hanvietDiv = document.createElement("div");
+        hanvietDiv.setAttribute("id", "hanviet");
+        annotationDiv.appendChild(hanvietDiv);
 
-		for (var i = 0; i < characters.length; i++) {
-			var charPlaceholder = document.createElement("span");
-			var charId = "hanvietChar" + i;
-			charPlaceholder.setAttribute("id", charId);
-			hanvietDiv.appendChild(charPlaceholder);
+        for (var i = 0; i < characters.length; i++) {
+            var charPlaceholder = document.createElement("span");
+            var charId = "hanvietChar" + i;
+            charPlaceholder.setAttribute("id", charId);
+            hanvietDiv.appendChild(charPlaceholder);
 
-			getHanVietAsync(characters[i], charId);
+            getHanVietAsync(characters[i], charId);
 
-			if (i + 1 < characters.length) {
-				hanvietDiv.innerHTML += " | ";
-			}
-		}
-	}
+            if (i + 1 < characters.length) {
+                hanvietDiv.innerHTML += " | ";
+            }
+        }
+    }
 }
 
 
@@ -104,13 +104,13 @@ var mandarinspotNode = document.getElementById("mandarinspot-tip");
 var currentVisibility = 'hidden';
 
 var observer = new MutationObserver(function() {
-	if (mandarinspotNode.style.visibility == 'visible' && currentVisibility == 'hidden') {
-		currentVisibility = 'visible';
-		annotateHanViet();
-	}
+    if (mandarinspotNode.style.visibility == 'visible' && currentVisibility == 'hidden') {
+        currentVisibility = 'visible';
+        annotateHanViet();
+    }
 
-	if (mandarinspotNode.style.visiblity != 'visible') {
-		currentVisibility = 'hidden';
-	}
+    if (mandarinspotNode.style.visiblity != 'visible') {
+        currentVisibility = 'hidden';
+    }
 });
 observer.observe(mandarinspotNode, { attributes: true, childList: false });
