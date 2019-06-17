@@ -66,9 +66,6 @@ function getHanVietAsync(character, charId) {
 }
 
 
-var lastCharacters = "";
-
-
 function annotateHanViet(){
     var characters = "";
     var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
@@ -81,17 +78,16 @@ function annotateHanViet(){
             characters += (text.charAt(i));
         }
 
-        if (characters == lastCharacters) {
-            return;
-        } else {
-            console.log('character differs: lastChars: ' + lastCharacters + ', current: ' + characters);
-        }
-        lastCharacters = characters;
-
         var annotationDiv = document.getElementById("mandarinspot-tip");
-        var hanvietDiv = document.createElement("div");
-        hanvietDiv.setAttribute("id", "hanviet");
-        annotationDiv.appendChild(hanvietDiv);
+
+        var hanvietDiv = document.getElementById("hanviet");
+        if (hanvietDiv) {
+            hanvietDiv.innerHTML = "";
+        } else {
+            hanvietDiv = document.createElement("div");
+            hanvietDiv.setAttribute("id", "hanviet");
+            annotationDiv.appendChild(hanvietDiv);
+        }
 
         for (var i = 0; i < characters.length; i++) {
             var charPlaceholder = document.createElement("span");

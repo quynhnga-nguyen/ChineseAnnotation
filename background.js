@@ -12,6 +12,16 @@ function parseHanVietResponse(responseText) {
     return hanviet;
 }
 
+function parseHanVietResponse2(responseText) {
+    var re = /Char:\d+:(.*?)=(.*?)\|/;
+    var matches = Array.from(responseText.matchAll(re));
+    var hanviet = "";
+    matches.forEach(function(match) {
+        hanviet += match[2];
+    });
+    return hanviet;
+}
+
 hanVietCache = {};
 
 chrome.runtime.onMessage.addListener(
@@ -23,10 +33,11 @@ chrome.runtime.onMessage.addListener(
                 return false;
             }
 
-            var url = "https://hvdic.thivien.net/whv/" + request.character;
+            // var url = "https://hvdic.thivien.net/whv/" + request.character;
+            var url = "http://www.vanlangsj.org/hanviet/ajax.php?methode=normal&query=" + request.character;
             fetch(url)
                 .then(response => response.text())
-                .then(text => parseHanVietResponse(text))
+                .then(text => parseHanVietResponse2(text))
                 .then(hanviet => {
                     hanVietCache[request.character] = hanviet;
                     sendResponse(hanviet);
