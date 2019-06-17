@@ -34,6 +34,9 @@
 }(DOMParser));
 
 
+var activeMspotElement = undefined;
+
+
 function getHanVietCallback(responseText, charId) {
     var hanviet = "";
     var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
@@ -45,28 +48,29 @@ function getHanVietCallback(responseText, charId) {
         hanviet += results.nodeValue + " ";
         results = nodes.iterateNext();
     }
-    //hanviet += " | ";
 
     document.getElementById(charId).innerHTML = hanviet;
 }
 
 
 function getHanVietAsync(character, charId) {
-    var xmlHttp = new XMLHttpRequest();
-
-    xmlHttp.onreadystatechange = function() { 
-        if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
-            getHanVietCallback(xmlHttp.responseText, charId);
+    chrome.runtime.sendMessage(
+        {character: character},
+        hanviet => {
+            console.log('hanviet: ' + hanviet);
+            if (hanviet) {
+                document.getElementById(charId).innerHTML = hanviet;
+            }
         }
-    }
-
-    xmlHttp.open("GET", "https://hvdic.thivien.net/whv/" + character, true); // true for asynchronous 
-    xmlHttp.send(null);
+    );
 }
 
 
+var lastCharacters = "";
+
+
 function annotateHanViet(){
-    var characters = [];
+    var characters = "";
     var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
     var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
     var results = nodes.iterateNext();
@@ -74,8 +78,15 @@ function annotateHanViet(){
     if (results) {
         var text = results.nodeValue;
         for (var i = 0; i < text.length && text.charAt(i) != '[' && text.charAt(i) != ' '; i++) {
-            characters.push(text.charAt(i));
+            characters += (text.charAt(i));
         }
+
+        if (characters == lastCharacters) {
+            return;
+        } else {
+            console.log('character differs: lastChars: ' + lastCharacters + ', current: ' + characters);
+        }
+        lastCharacters = characters;
 
         var annotationDiv = document.getElementById("mandarinspot-tip");
         var hanvietDiv = document.createElement("div");
@@ -97,6 +108,20 @@ function annotateHanViet(){
     }
 }
 
+function repositionBubbleIfNecessary() {
+    var annotationDiv = document.getElementById("mandarinspot-tip");
+    if (!activeMspotElement) {
+        return;
+    }
+
+    var annotationBox = annotationDiv.getBoundingClientRect();
+    var mspotElementBox = activeMspotElement.getBoundingClientRect();
+    if (annotationBox.top <= mspotElementBox.top &&
+        annotationBox.bottom >= mspotElementBox.top) {
+        annotationDiv.style.top = Math.round(mspotElementBox.top - annotationBox.height - 3) + "px";
+    }
+}
+
 
 mandarinspot.annotate();
 
@@ -114,3 +139,10 @@ var observer = new MutationObserver(function() {
     }
 });
 observer.observe(mandarinspotNode, { attributes: true, childList: false });
+
+$(function() {
+    $(document).on("mouseover", "x-mspot", function(event) {
+        activeMspotElement = event.currentTarget;
+        repositionBubbleIfNecessary();
+    });
+});
