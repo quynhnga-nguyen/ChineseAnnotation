@@ -114,7 +114,7 @@ function repositionBubbleIfNecessary() {
     var mspotElementBox = activeMspotElement.getBoundingClientRect();
     if (annotationBox.top <= mspotElementBox.top &&
         annotationBox.bottom >= mspotElementBox.top) {
-        annotationDiv.style.top = Math.round(mspotElementBox.top - annotationBox.height - 3) + "px";
+        annotationDiv.style.top = Math.round(parseInt(annotationDiv.style.top) - (annotationBox.bottom - mspotElementBox.top + 3)) + "px";
     }
 }
 
