@@ -60,6 +60,7 @@ function getHanVietAsync(character, charId) {
             console.log('hanviet: ' + hanviet);
             if (hanviet) {
                 document.getElementById(charId).innerHTML = hanviet;
+                repositionBubbleIfNecessary();
             }
         }
     );
@@ -89,7 +90,6 @@ function annotateHanViet(){
             annotationDiv.appendChild(hanvietDiv);
         }
 
-        hanvietDiv.innerHTML += "[ ";
         for (var i = 0; i < characters.length; i++) {
             var charPlaceholder = document.createElement("span");
             var charId = "hanvietChar" + i;
@@ -102,7 +102,6 @@ function annotateHanViet(){
                 hanvietDiv.innerHTML += " | ";
             }
         }
-        hanvietDiv.innerHTML += " ]";
     }
 }
 
