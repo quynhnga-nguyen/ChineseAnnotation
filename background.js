@@ -14,11 +14,8 @@ function parseHanVietResponse(responseText) {
 
 function parseHanVietResponse2(responseText) {
     var re = /Char:\d+:(.*?)=(.*?)\|/;
-    var matches = Array.from(responseText.matchAll(re));
-    var hanviet = "";
-    matches.forEach(function(match) {
-        hanviet += match[2];
-    });
+    var matches = responseText.match(re);
+    var hanviet = matches[2];
     return hanviet;
 }
 
