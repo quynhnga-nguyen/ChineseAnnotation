@@ -36,23 +36,6 @@
 
 var activeMspotElement = undefined;
 
-
-function getHanVietCallback(responseText, charId) {
-    var hanviet = "";
-    var xpath = "//div[@class='info']//div//span[@class='hvres-goto-link']/text()";
-    var responseDOM = new DOMParser().parseFromString(responseText, 'text/html');
-    var nodes = responseDOM.evaluate(xpath, responseDOM, null, XPathResult.ANY_TYPE, null);
-
-    var results = nodes. iterateNext();
-    while (results) {
-        hanviet += results.nodeValue + " ";
-        results = nodes.iterateNext();
-    }
-
-    document.getElementById(charId).innerHTML = hanviet;
-}
-
-
 function getHanVietAsync(character, charId) {
     chrome.runtime.sendMessage(
         {character: character},
@@ -65,7 +48,6 @@ function getHanVietAsync(character, charId) {
         }
     );
 }
-
 
 function annotateHanViet(){
     var characters = "";
