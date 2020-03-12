@@ -33,8 +33,20 @@
     };  
 }(DOMParser));
 
-
 var activeMspotElement = undefined;
+var wordFrequency = {};
+
+function updateWordFrequency(word) {
+    const MIN_TIME_BETWEEN_LOOKUPS = 10;
+
+    if (!wordFrequency[word]) {
+        wordFrequency[word] = {frequency: 1, lastLookupTime: Date.now()};
+    } else if ((Date.now() - wordFrequency[word].lastLookupTime) / 1000 > MIN_TIME_BETWEEN_LOOKUPS) {
+        wordFrequency[word].frequency++;
+        wordFrequency[word].lastLookupTime = Date.now();
+    }
+    console.log(word + ": " + wordFrequency[word].frequency);
+}
 
 function getHanVietAsync(character, charId) {
     chrome.runtime.sendMessage(
@@ -49,7 +61,7 @@ function getHanVietAsync(character, charId) {
     );
 }
 
-function annotateHanViet(){
+function annotateHanViet() {
     var characters = "";
     var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
     var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
@@ -57,6 +69,9 @@ function annotateHanViet(){
 
     if (results) {
         var text = results.nodeValue;
+
+        updateWordFrequency(text);
+
         for (var i = 0; i < text.length && text.charAt(i) != '[' && text.charAt(i) != ' '; i++) {
             characters += (text.charAt(i));
         }
@@ -100,7 +115,6 @@ function repositionBubbleIfNecessary() {
         annotationDiv.style.top = Math.round(parseInt(annotationDiv.style.top) - (annotationBox.bottom - mspotElementBox.top + 3)) + "px";
     }
 }
-
 
 mandarinspot.annotate();
 

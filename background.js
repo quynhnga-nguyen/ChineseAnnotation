@@ -5,13 +5,12 @@ function parseHanVietResponse(responseText) {
     return hanviet;
 }
 
-hanVietCache = {};
+var hanVietCache = {};
 
 chrome.runtime.onMessage.addListener(
     function(request, sender, sendResponse) {
         if (request.character != undefined) {
             if (hanVietCache[request.character]) {
-                console.log('Getting character from cache: ' + request.character);
                 sendResponse(hanVietCache[request.character]);
                 return false;
             }
