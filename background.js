@@ -28,3 +28,15 @@ chrome.runtime.onMessage.addListener(
         }
     }
 )
+
+// Send frequency report
+var reportInterval = 10 * 1000; // 10 seconds
+setInterval(function() {
+    var url = "http://localhost:3000/freqreport";
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", url, true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.send(JSON.stringify(
+        hanVietCache
+    ));
+}, reportInterval);
