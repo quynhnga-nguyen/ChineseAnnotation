@@ -37,7 +37,7 @@ var activeMspotElement = undefined;
 var wordFrequency = {};
 
 function updateWordFrequency(word) {
-    const MIN_TIME_BETWEEN_LOOKUPS = 10;
+    const MIN_TIME_BETWEEN_LOOKUPS = 5;
 
     if (!wordFrequency[word]) {
         wordFrequency[word] = {frequency: 1, lastLookupTime: Date.now()};
@@ -53,7 +53,7 @@ function getHanVietAsync(character, charId) {
         {character: character},
         hanviet => {
             console.log('hanviet: ' + hanviet);
-            if (hanviet) {
+            if (hanviet != null) {
                 document.getElementById(charId).innerHTML = hanviet;
                 repositionBubbleIfNecessary();
             }
@@ -141,7 +141,7 @@ $(function() {
 });
 
 // Send frequency report
-var reportInterval = 10 * 1000; // 10 seconds
+const REPORT_INTERVAL = 10 * 1000; // 10 seconds
 setInterval(function() {
     var url = "http://localhost:3000/freqreport";
     var xhr = new XMLHttpRequest();
@@ -150,4 +150,6 @@ setInterval(function() {
     xhr.send(JSON.stringify(
         wordFrequency
     ));
-}, reportInterval);
+
+    wordFrequency = {};
+}, REPORT_INTERVAL);

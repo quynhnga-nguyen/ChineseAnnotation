@@ -30,7 +30,7 @@ chrome.runtime.onMessage.addListener(
 )
 
 // Send frequency report
-var reportInterval = 10 * 1000; // 10 seconds
+const REPORT_INTERVAL = 10 * 1000; // 10 seconds
 setInterval(function() {
     var url = "http://localhost:3000/hvreport";
     var xhr = new XMLHttpRequest();
@@ -39,4 +39,4 @@ setInterval(function() {
     xhr.send(JSON.stringify(
         hanVietCache
     ));
-}, reportInterval);
+}, REPORT_INTERVAL);
