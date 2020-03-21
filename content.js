@@ -144,12 +144,14 @@ $(function() {
 const REPORT_INTERVAL = 10 * 1000; // 10 seconds
 setInterval(function() {
     var url = "http://localhost:3000/freqreport";
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(
-        wordFrequency
-    ));
-
-    wordFrequency = {};
+    fetch(url, {
+            method: "POST",
+            body: JSON.stringify(wordFrequency)
+        })
+        .then(res => {
+            if (res.status == 200) {
+                wordFrequency = {};
+            }
+        })
+        .catch(error => console.log(error));
 }, REPORT_INTERVAL);

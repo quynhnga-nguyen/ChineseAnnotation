@@ -33,10 +33,9 @@ chrome.runtime.onMessage.addListener(
 const REPORT_INTERVAL = 10 * 1000; // 10 seconds
 setInterval(function() {
     var url = "http://localhost:3000/hvreport";
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", url, true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.send(JSON.stringify(
-        hanVietCache
-    ));
+    fetch(url, {
+            method: "POST",
+            body: JSON.stringify(hanVietCache)
+        })
+        .catch(error => console.log(error));
 }, REPORT_INTERVAL);
