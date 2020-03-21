@@ -36,15 +36,30 @@
 var activeMspotElement = undefined;
 var wordFrequency = {};
 
+function getDefinition(word) {
+    var definitionXPath = "//div[@id='mandarinspotspot-tip-en']/text()";
+    var nodes = document.evaluate(definitionXPath, document, null, XPathResult.ANY_TYPE, null);
+    var definition = [];
+    var results;
+
+    while (results = nodes.iterateNext()) {
+        definition.push(results.nodeValue.substring(2));
+    }
+
+    return definition;
+}
+
 function updateWordFrequency(word) {
-    const MIN_TIME_BETWEEN_LOOKUPS = 5;
+    const MIN_SECONDS_BETWEEN_LOOKUPS = 5;
 
     if (!wordFrequency[word]) {
-        wordFrequency[word] = {frequency: 1, lastLookupTime: Date.now()};
-    } else if ((Date.now() - wordFrequency[word].lastLookupTime) / 1000 > MIN_TIME_BETWEEN_LOOKUPS) {
+        var definition = getDefinition(word);
+        wordFrequency[word] = {frequency: 1, lastLookupTime: Date.now(), definition: definition};
+    } else if ((Date.now() - wordFrequency[word].lastLookupTime) / 1000 > MIN_SECONDS_BETWEEN_LOOKUPS) {
         wordFrequency[word].frequency++;
         wordFrequency[word].lastLookupTime = Date.now();
     }
+
     console.log(word + ": " + wordFrequency[word].frequency);
 }
 
@@ -63,8 +78,8 @@ function getHanVietAsync(character, charId) {
 
 function annotateHanViet() {
     var characters = "";
-    var annotationXpath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
-    var nodes = document.evaluate(annotationXpath, document, null, XPathResult.ANY_TYPE, null);
+    var annotationXPath = "//div[@id='mandarinspot-tip-hz']/x-mspot/text()";
+    var nodes = document.evaluate(annotationXPath, document, null, XPathResult.ANY_TYPE, null);
     var results = nodes.iterateNext();
 
     if (results) {
@@ -143,9 +158,14 @@ $(function() {
 // Send frequency report
 const REPORT_INTERVAL = 10 * 1000; // 10 seconds
 setInterval(function() {
+    if (Object.keys(wordFrequency).length === 0) {
+        return;
+    }
+
     var url = "http://localhost:3000/freqreport";
     fetch(url, {
             method: "POST",
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(wordFrequency)
         })
         .then(res => {

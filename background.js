@@ -35,6 +35,7 @@ setInterval(function() {
     var url = "http://localhost:3000/hvreport";
     fetch(url, {
             method: "POST",
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(hanVietCache)
         })
         .catch(error => console.log(error));
