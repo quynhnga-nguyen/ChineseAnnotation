@@ -34,33 +34,53 @@
 }(DOMParser));
 
 var activeMspotElement = undefined;
-var wordFrequency = {};
+var wordFrequency = [];
 
-function getDefinition(word) {
-    var definitionXPath = "//div[@id='mandarinspotspot-tip-en']/text()";
-    var nodes = document.evaluate(definitionXPath, document, null, XPathResult.ANY_TYPE, null);
-    var definition = [];
-    var results;
+function getPinyinAndDefinition(word) {
+    var xPath = "//div[@id='mandarinspotspot-tip-py' or @id='mandarinspotspot-tip-en']";
+    var nodes = document.evaluate(xPath, document, null, XPathResult.ANY_TYPE, null);
+    var pinyinAndDefinition = [];
+    var pinyinNode;
 
-    while (results = nodes.iterateNext()) {
-        definition.push(results.nodeValue.substring(2));
+    while (pinyinNode = nodes.iterateNext()) {
+        var pinyin = pinyinNode.textContent;
+
+        var definitionNode = nodes.iterateNext();
+        var definitionText = document.evaluate("text()", definitionNode, null, XPathResult.ANY_TYPE, null);
+        var definition = [];
+        var results;
+        while (results = definitionText.iterateNext()) {
+            definition.push(results.nodeValue.substring(2));
+        }
+
+        pinyinAndDefinition.push({
+            "pinyin": pinyin,
+            "definition": definition
+        });
     }
 
-    return definition;
+    return pinyinAndDefinition;
 }
 
 function updateWordFrequency(word) {
     const MIN_SECONDS_BETWEEN_LOOKUPS = 5;
+    var item = wordFrequency.find(item => item.word === word);
 
-    if (!wordFrequency[word]) {
-        var definition = getDefinition(word);
-        wordFrequency[word] = {frequency: 1, lastLookupTime: Date.now(), definition: definition};
-    } else if ((Date.now() - wordFrequency[word].lastLookupTime) / 1000 > MIN_SECONDS_BETWEEN_LOOKUPS) {
-        wordFrequency[word].frequency++;
-        wordFrequency[word].lastLookupTime = Date.now();
+    if (!item) {
+        wordFrequency.push({
+            "word": word,
+            "frequency": 1,
+            "lastLookupTime": Date.now(),
+            // TODO: handle race condition that can happen when the pinyin and def change 
+            // because user hovers to another word in the mean time
+            "pinyinAndDefinition": getPinyinAndDefinition(word)
+        });
+    } else if ((Date.now() - item.lastLookupTime) / 1000 > MIN_SECONDS_BETWEEN_LOOKUPS) {
+        item.frequency++;
+        item.lastLookupTime = Date.now();
     }
 
-    console.log(word + ": " + wordFrequency[word].frequency);
+    console.log("Updated word: " + word);
 }
 
 function getHanVietAsync(character, charId) {
@@ -170,7 +190,7 @@ setInterval(function() {
         })
         .then(res => {
             if (res.status == 200) {
-                wordFrequency = {};
+                wordFrequency = [];
             }
         })
         .catch(error => console.log(error));
