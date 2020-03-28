@@ -37,6 +37,16 @@ var activeMspotElement = undefined;
 var wordFrequency = [];
 
 function getPinyinAndDefinition(word) {
+    // Make sure the pinyin and definition are of the correct word
+    var wordNode = document
+                    .evaluate("//div[@id='mandarinspot-tip-hz']/x-mspot/text()", document, null, XPathResult.ANY_TYPE, null)
+                    .iterateNext();
+    var currentWord = (wordNode ? wordNode.nodeValue : undefined);
+
+    if (currentWord != word) {
+        return null;
+    }
+
     var xPath = "//div[@id='mandarinspotspot-tip-py' or @id='mandarinspotspot-tip-en']";
     var nodes = document.evaluate(xPath, document, null, XPathResult.ANY_TYPE, null);
     var pinyinAndDefinition = [];
@@ -63,18 +73,19 @@ function getPinyinAndDefinition(word) {
 }
 
 function updateWordFrequency(word) {
-    const MIN_SECONDS_BETWEEN_LOOKUPS = 5;
+    const MIN_SECONDS_BETWEEN_LOOKUPS = 5 * 60; // 5 minutes
     var item = wordFrequency.find(item => item.word === word);
 
     if (!item) {
-        wordFrequency.push({
-            "word": word,
-            "frequency": 1,
-            "lastLookupTime": Date.now(),
-            // TODO: handle race condition that can happen when the pinyin and def change 
-            // because user hovers to another word in the mean time
-            "pinyinAndDefinition": getPinyinAndDefinition(word)
-        });
+        var pinyinAndDefinition = getPinyinAndDefinition(word);
+        if (pinyinAndDefinition) {
+            wordFrequency.push({
+                "word": word,
+                "frequency": 1,
+                "lastLookupTime": Date.now(),
+                "pinyinAndDefinition": pinyinAndDefinition
+            });
+        }
     } else if ((Date.now() - item.lastLookupTime) / 1000 > MIN_SECONDS_BETWEEN_LOOKUPS) {
         item.frequency++;
         item.lastLookupTime = Date.now();
@@ -176,7 +187,7 @@ $(function() {
 });
 
 // Send frequency report
-const REPORT_INTERVAL = 10 * 1000; // 10 seconds
+const REPORT_INTERVAL = 60 * 1000; // 1 min
 setInterval(function() {
     if (Object.keys(wordFrequency).length === 0) {
         return;
