@@ -193,7 +193,7 @@ setInterval(function() {
         return;
     }
 
-    var url = "http://localhost:3000/freqreport";
+    var url = "http://localhost:8080/freqreport";
     fetch(url, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
