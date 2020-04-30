@@ -31,9 +31,9 @@ chrome.runtime.onMessage.addListener(
 
 // Send frequency report
 const REPORT_INTERVAL = 60 * 1000; // 1 minute
+const URL = "http://34.83.178.47:80/hvreport";
 setInterval(function() {
-    var url = "http://localhost:8080/hvreport";
-    fetch(url, {
+    fetch(URL, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(hanVietCache)

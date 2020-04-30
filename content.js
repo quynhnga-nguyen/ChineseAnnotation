@@ -193,8 +193,8 @@ setInterval(function() {
         return;
     }
 
-    var url = "http://localhost:8080/freqreport";
-    fetch(url, {
+    const URL = "http://34.83.178.47:80/freqreport";
+    fetch(URL, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(wordFrequency)
