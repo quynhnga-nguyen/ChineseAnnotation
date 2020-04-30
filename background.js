@@ -32,7 +32,7 @@ chrome.runtime.onMessage.addListener(
 // Send frequency report
 const REPORT_INTERVAL = 60 * 1000; // 1 minute
 setInterval(function() {
-    var url = "http://localhost:80/hvreport";
+    var url = "http://localhost:8080/hvreport";
     fetch(url, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
