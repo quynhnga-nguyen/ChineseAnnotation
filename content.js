@@ -194,9 +194,11 @@ setInterval(function() {
     }
 
     const URL = "http://34.83.178.47:80/freqreport";
+
     fetch(URL, {
             method: "POST",
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(wordFrequency)
         })
         .then(res => {

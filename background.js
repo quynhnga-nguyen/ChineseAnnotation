@@ -16,7 +16,7 @@ chrome.runtime.onMessage.addListener(
             }
 
             var url = "http://www.vanlangsj.org/hanviet/ajax.php?methode=normal&query=" + request.character;
-            fetch(url)
+            fetch(url, {mode: 'no-cors'})
                 .then(response => response.text())
                 .then(text => parseHanVietResponse(text))
                 .then(hanviet => {
@@ -35,7 +35,8 @@ const URL = "http://34.83.178.47:80/hvreport";
 setInterval(function() {
     fetch(URL, {
             method: "POST",
-            headers: { 'Content-Type': 'application/json' },
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain' },
             body: JSON.stringify(hanVietCache)
         })
         .catch(error => console.log(error));
