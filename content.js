@@ -193,7 +193,7 @@ setInterval(function() {
         return;
     }
 
-    const URL = "http://34.83.178.47:80/freqreport";
+    const URL = "https://vocab.nganhan.xyz/freqreport";
 
     fetch(URL, {
             method: "POST",
