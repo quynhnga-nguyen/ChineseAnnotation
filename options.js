@@ -19,7 +19,6 @@ function restoreOptions() {
   chrome.storage.sync.get({
     useLocalhost: false,
   }, function(items) {
-    console.log(items);
     document.getElementById("useLocalhost").checked = items.useLocalhost;
   });
 }
