@@ -5,6 +5,16 @@ function parseHanVietResponse(responseText) {
     return hanviet;
 }
 
+BACKEND = "https://vocab.nganhan.xyz";
+
+chrome.storage.sync.get({
+    useLocalhost: false,
+}, function(items) {
+    if (items.useLocalhost) {
+        BACKEND = "http://localhost:8080";
+    }
+});
+
 var hanVietCache = {};
 
 chrome.runtime.onMessage.addListener(
@@ -31,9 +41,9 @@ chrome.runtime.onMessage.addListener(
 
 // Send frequency report
 const REPORT_INTERVAL = 60 * 1000; // 1 minute
-const URL = "https://vocab.nganhan.xyz/hvreport";
+
 setInterval(function() {
-    fetch(URL, {
+    fetch(BACKEND + "/hvreport", {
             method: "POST",
             mode: 'no-cors',
             headers: { 'Content-Type': 'text/plain' },
