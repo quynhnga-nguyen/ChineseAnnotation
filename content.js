@@ -33,16 +33,6 @@
     };  
 }(DOMParser));
 
-BACKEND = "https://vocab.nganhan.xyz";
-
-chrome.storage.sync.get({
-    useLocalhost: false,
-}, function(items) {
-    if (items.useLocalhost) {
-        BACKEND = "http://localhost:8080";
-    }
-});
-
 var activeMspotElement = undefined;
 var wordFrequency = [];
 
@@ -203,16 +193,19 @@ setInterval(function() {
         return;
     }
 
-    fetch(BACKEND + "/freqreport", {
-            method: "POST",
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(wordFrequency)
-        })
-        .then(res => {
-            if (res.status == 200) {
-                wordFrequency = [];
-            }
-        })
-        .catch(error => console.log(error));
+    getBackendUrl(
+        (backendUrl) => {
+            fetch(backendUrl + "/freqreport", {
+                    method: "POST",
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(wordFrequency)
+                })
+                .then(res => {
+                    if (res.status == 200) {
+                        wordFrequency = [];
+                    }
+                })
+                .catch(error => console.log(error));
+        });
 }, REPORT_INTERVAL);

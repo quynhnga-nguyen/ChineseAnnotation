@@ -1,6 +1,6 @@
 // Saves options to chrome.storage
-function save_options() {
-  var useLocalhost = document.getElementById('use-localhost').checked;
+function saveOptions() {
+  var useLocalhost = document.getElementById('useLocalhost').checked;
   chrome.storage.sync.set({
     useLocalhost: useLocalhost,
   }, function() {
@@ -15,17 +15,17 @@ function save_options() {
 
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
-function restore_options() {
+function restoreOptions() {
   chrome.storage.sync.get({
     useLocalhost: false,
   }, function(items) {
     console.log(items);
-    document.getElementById('use-localhost').checked = items.useLocalhost;
+    document.getElementById('useLocalhost').checked = items.useLocalhost;
   });
 }
 
 document.addEventListener("DOMContentLoaded", function(event) {
-  restore_options();
+  restoreOptions();
   document.getElementById('save').addEventListener('click',
-      save_options);
+      saveOptions);
 });
