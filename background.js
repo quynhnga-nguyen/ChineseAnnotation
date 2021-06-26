@@ -31,13 +31,16 @@ chrome.runtime.onMessage.addListener(
 
 // Send frequency report
 const REPORT_INTERVAL = 60 * 1000; // 1 minute
-const URL = "https://vocab.nganhan.xyz/hvreport";
+
 setInterval(function() {
-    fetch(URL, {
-            method: "POST",
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(hanVietCache)
-        })
-        .catch(error => console.log(error));
+    getBackendUrl(
+        (backendUrl) => {
+            fetch(backendUrl + "/hvreport", {
+                method: "POST",
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain' },
+                body: JSON.stringify(hanVietCache)
+            })
+            .catch(error => console.log(error));
+        });
 }, REPORT_INTERVAL);

@@ -193,18 +193,19 @@ setInterval(function() {
         return;
     }
 
-    const URL = "https://vocab.nganhan.xyz/freqreport";
-
-    fetch(URL, {
-            method: "POST",
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify(wordFrequency)
-        })
-        .then(res => {
-            if (res.status == 200) {
-                wordFrequency = [];
-            }
-        })
-        .catch(error => console.log(error));
+    getBackendUrl(
+        (backendUrl) => {
+            fetch(backendUrl + "/freqreport", {
+                    method: "POST",
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify(wordFrequency)
+                })
+                .then(res => {
+                    if (res.status == 200) {
+                        wordFrequency = [];
+                    }
+                })
+                .catch(error => console.log(error));
+        });
 }, REPORT_INTERVAL);

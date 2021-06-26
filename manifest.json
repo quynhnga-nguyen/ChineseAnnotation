@@ -10,15 +10,26 @@
       "js": [
         "jquery-3.3.1.js",
         "mandarinspot.min.js",
+        "settings.js",
         "content.js"
       ]
     }
   ],
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "settings.js",
+      "background.js"
+    ],
     "persistent": true
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": false
   },
   "browser_action": {
     "default_icon": "icon.png"
-  }
+  },
+  "permissions": [
+    "storage"
+  ]
 }
